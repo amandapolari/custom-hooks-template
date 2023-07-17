@@ -16,6 +16,7 @@
 
 ### Resolução
 
+
 ## 2 Prática 2
 
 ### Enunciado
@@ -24,11 +25,32 @@
 
 ### Resolução
 
+-   Código do `useRequestData` do material assíncrono:
+    ```
+        import React, {useState, useEffect} from 'react'
+        import axios from 'axios'
+
+        export function useRequestData(url, initialState) {
+            const [data, setData] = useState(initialState)
+
+            useEffect(() => {
+                axios.get(url)
+                    .then(response => {
+                        setData(response.data)
+                })
+                    .catch(error => console.log(error.response.data)
+            )}, [url])
+
+        return data
+        }
+    ```
+-
+
 ## 3 Prática 3
 
 ### Enunciado
 
--   Atutalize o `useRequestData` do exercício anterior:
+-   Atualize o `useRequestData` do exercício anterior:
     -   Faça o tratamento de erros: ele deve mostrar uma mesnagem de erro caso a requisição caia no catch.
     -   Adicione um indicador de carregamento: o suário deve saber que os dados estão sendo carregados.
     -   Utilize o nome `isLoading` como variável de estado.
