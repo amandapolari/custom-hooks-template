@@ -219,7 +219,108 @@
         }
     ```
 
--
+-   Analisando os dois `Custom Hooks` criados, percebo que são identicos e apenas o `path` é diferente neles:
+    ![Alt text](image.png)
+
+-   A ideia agora é: Fazer **UM** custom hook genérico para utilizar nos dois casos!
+
+---
+
+-   Em `hooks` criar um arquivo chamado `useRequestData.js`, nesse arquivo eu preciso criar uma função chamada `useRequestData`, nessa função eu adapto um custom hook anteriormente criado para algo mais genérico e que receba um `path` como parâmetro, pois essa é a unica coisa que muda, ficando da seguinte forma:
+
+    ```
+    import { useEffect, useState } from 'react';
+    import { BASE_URL } from '../constants/constants';
+    import axios from 'axios';
+
+    const useRequestData = (path) => {
+        const [data, setData] = useState([]);
+
+        useEffect(() => {
+            axios
+                .get(`${BASE_URL}${path}`)
+                .then((response) => {
+                    setData(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }, []);
+        return data;
+    };
+
+    export default useRequestData;
+
+    ```
+
+-   Agora irei fazer a adptação em `UserNamesPage.js` utilizando o `useRequestData.js`:
+
+-   Agora irei substituir o `useCapturanome()` para `useRequestData()`, e preciso passar o parâmetro necessário, agora o `UserNamesPage.js` fica com o seguinte código:
+
+    ```
+    import { Title, NameContainer } from '../style';
+    import { Card } from '../components/Card/Card';
+    import useRequestData from '../hooks/useRequestData';
+
+    const UserNamesPage = () => {
+        const retornoDaFuncao = useRequestData('users');
+        return (
+            <div>
+                <Title>Nomes dos usuários</Title>
+                <NameContainer>
+                    {retornoDaFuncao.map((usuario) => {
+                        return (
+                            <Card
+                                key={usuario.id}
+                                text={usuario.name}
+                                backgroudColor={'nome'}
+                                textColor={'nome'}
+                            />
+                        );
+                    })}
+                </NameContainer>
+            </div>
+        );
+    };
+
+    export default UserNamesPage;
+    ```
+
+-   Para a página de `CommentsPage.js`, eu faço a mesma adaptação:
+
+    ```
+    import { Title, PostContainer } from '../style';
+    import { Card } from '../components/Card/Card';
+    import useRequestData from '../hooks/useRequestData';
+
+    const CommentsPage = () => {
+        const postagens = useRequestData('comments');
+
+        return (
+            <div>
+                <Title>Comentários dos usuários</Title>
+                <PostContainer>
+                    {postagens.map((post) => {
+                        return (
+                            <Card
+                                key={post.id}
+                                text={post.body}
+                                backgroudColor={'#1dc690'}
+                                textColor={'#ffffff'}
+                            />
+                        );
+                    })}
+                </PostContainer>
+            </div>
+        );
+    };
+
+    export default CommentsPage;
+
+    ```
+
+-   Agora posso excluir os arquivos: `useCapturarNome.js` e `useCapturarPostagem`, e utilizar um único custom hooks para duas requisições diferentes
+-   Irei deixar esses dois arquivos para poder consultar depois
 
 ## 3 Prática 3
 

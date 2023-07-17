@@ -1,10 +1,9 @@
 import { Title, NameContainer } from '../style';
 import { Card } from '../components/Card/Card';
-import useCapturarNome from '../hooks/useCapturarNome';
+import useRequestData from '../hooks/useRequestData';
 
 const UserNamesPage = () => {
-    const retornoDaFuncao = useCapturarNome();
-
+    const retornoDaFuncao = useRequestData('users');
     return (
         <div>
             <Title>Nomes dos usuários</Title>

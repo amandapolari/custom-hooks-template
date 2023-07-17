@@ -1,9 +1,9 @@
 import { Title, PostContainer } from '../style';
 import { Card } from '../components/Card/Card';
-import useCapturarPostagem from '../hooks/useCapturarPostagem';
+import useRequestData from '../hooks/useRequestData';
 
 const CommentsPage = () => {
-    const postagens = useCapturarPostagem();
+    const postagens = useRequestData('comments');
 
     return (
         <div>
