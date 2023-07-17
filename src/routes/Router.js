@@ -8,6 +8,7 @@ const Router = () => {
         <BrowserRouter>
             <Header />
             <Routes>
+                {/* Poderia ser 'index' ou path='/' */}
                 <Route index element={<UserNamesPage />} />
                 <Route path="/comments" element={<CommentsPage />} />
             </Routes>
