@@ -1,7 +1,7 @@
 export const goToNamesPage = (navigate) => {
-    navigate("/")
-}
+    navigate('/');
+};
 
 export const goToCommentsPage = (navigate) => {
-    navigate("/comments")
-}
+    navigate('/comments');
+};
