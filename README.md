@@ -130,6 +130,66 @@
 
     ***
 
+    -   Para `useCapturarPostagem`:
+    -   Em `hooks` criei um arquivo chamado `useCapturarPostagens.js`;
+    -   Copiei a lógica de `CommentsPages.js` e colei dentro de `useCapturarPostagnes.js`, fiz as importações e o retorno, ficando da seguinte forma:
+
+        ```
+        import axios from 'axios';
+        import { useEffect, useState } from 'react';
+        import { BASE_URL } from '../constants/constants';
+
+        const useCapturarPostagem = () => {
+            const [postagens, setPostagens] = useState([]);
+
+            useEffect(() => {
+                axios
+                    .get(`${BASE_URL}comments`)
+                    .then((response) => {
+                        setPostagens(response.data);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }, []);
+            return postagens;
+        };
+
+        export default useCapturarPostagem;
+        ```
+
+    -   Em `useCapturarPostagem.js`, eu importo e adpto para ser renderizado, ficando na seguinte forma:
+
+        ```
+        import { Title, PostContainer } from '../style';
+        import { Card } from '../components/Card/Card';
+        import useCapturarPostagem from '../hooks/useCapturarPostagem';
+
+        const CommentsPage = () => {
+            const postagens = useCapturarPostagem();
+
+            return (
+                <div>
+                    <Title>Comentários dos usuários</Title>
+                    <PostContainer>
+                        {postagens.map((post) => {
+                            return (
+                                <Card
+                                    key={post.id}
+                                    text={post.body}
+                                    backgroudColor={'#1dc690'}
+                                    textColor={'#ffffff'}
+                                />
+                            );
+                        })}
+                    </PostContainer>
+                </div>
+            );
+        };
+
+        export default CommentsPage;
+        ```
+
 ## 2 Prática 2
 
 ### Enunciado
