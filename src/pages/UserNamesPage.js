@@ -1,28 +1,15 @@
-import { useState, useEffect } from 'react';
-import { BASE_URL } from '../constants/constants';
-import axios from 'axios';
 import { Title, NameContainer } from '../style';
 import { Card } from '../components/Card/Card';
+import useCapturarNome from '../hooks/useCapturarNome';
 
 const UserNamesPage = () => {
-    const [nomeUsuarios, setNomeUsuarios] = useState([]);
-
-    useEffect(() => {
-        axios
-            .get(`${BASE_URL}users`)
-            .then((response) => {
-                setNomeUsuarios(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
+    const retornoDaFuncao = useCapturarNome();
 
     return (
         <div>
             <Title>Nomes dos usuários</Title>
             <NameContainer>
-                {nomeUsuarios.map((usuario) => {
+                {retornoDaFuncao.map((usuario) => {
                     return (
                         <Card
                             key={usuario.id}
