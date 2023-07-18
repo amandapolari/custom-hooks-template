@@ -292,109 +292,72 @@
 
 ### Resolução
 
--   Criar um novo estado para acompanhar o estado true ou false do `isLoading`, iniciando como true e depois irá ser setado como false quando parar de carregar:
+#### Procedimento -> Criando `isLoading` em `useRequestData`:
+
+1. Em `useRequestData.js`, criei um novo estado chamado `isLoading`, para acompanhar essa mudança com `true` ou `false`
+2. `isLoading` deve ser iniciado como `true` e depois irá ser setado como `false` quando parar de carregar:
     ```
     const [isLoading, seIsLoading] = useState(true);
     ```
--   Se a requisição for concluída, logo sera em `then` eu seto para false e em cath tmbm!:
+3. O carregamento termina quando a requisição for concluída ou quando der erro, então nesses dois casos eu seto i `seIsLoading` com `false`
     ```
-                .then((response) => {
-                    setData(response.data);
-                    seIsLoading(false);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    seIsLoading(false);
-                });
+    .then((response) => {
+        setData(response.data);
+        seIsLoading(false);
+    })
+    .catch((error) => {
+        console.log(error);
+        seIsLoading(false);
+    });
     ```
--   por array, a ordem importa, por obje n ???
+4. Retorno o `isLoading`:
+    ```
+    return [data, isLoading];
+    ```
 
--   Em `UserNamesPages.js`
+#### Procedimento -> Recebendo `isLoading` em `UserNamesPages.js`:
+
+1. Em `UserNamesPages.js`, recebo `isLoading` no array já existente.
 
     ```
     const [nomeUsuarios, isLoading] = useRequestData('users');
 
     ```
 
-(- tRABALHAR COM COLCHETES EU FICO DE OLHO NA POSIÇÃO, N IMPORTA O NOME)
-
-(- AGORA SE EU TRABALHAR COM A {} ..SO DEUS SABE)
-
--   `useRequestData.js` fica assim:
-
+2. E posso utiliza-lo:
     ```
-    /* eslint-disable react-hooks/exhaustive-deps */
-    import { useEffect, useState } from 'react';
-    import { BASE_URL } from '../constants/constants';
-    import axios from 'axios';
-
-    const useRequestData = (path) => {
-        const [data, setData] = useState([]);
-        const [isLoading, seIsLoading] = useState(true);
-
-        useEffect(() => {
-            axios
-                .get(`${BASE_URL}${path}`)
-                .then((response) => {
-                    setData(response.data);
-                    // setTimeout(() => seIsLoading(false), 6000);
-                    seIsLoading(false);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    seIsLoading(false);
-                });
-        }, []);
-        return [data, isLoading];
-    };
-
-    export default useRequestData;
+    (...)
+    return (
+                <div>
+                    <Title>Nomes dos usuários</Title>
+                    <NameContainer>
+                        {isLoading ? (
+                            <p>CARREGANDO</p>
+                        ) : (
+                            nomeUsuarios.map((usuario) => {
+                            (...)
+                            })
+                        )}
+                    </NameContainer>
+                </div>
+            );
+    (...)
     ```
 
--   `UserNamePage.js` fica assim:
+#### Procedimento -> Criando `isError` em `useRequestData.js`:
 
-    ```
-    import { Title, NameContainer } from '../style';
-    import { Card } from '../components/Card/Card';
-    import useRequestData from '../hooks/useRequestData';
+1. Criar um estado em `useRequestData.js`;
 
-    const UserNamesPage = () => {
-        const [nomeUsuarios, isLoading] = useRequestData('users');
-        return (
-            <div>
-                <Title>Nomes dos usuários</Title>
-                <NameContainer>
-                    {isLoading ? (
-                        <p>CARREGANDO</p>
-                    ) : (
-                        nomeUsuarios.map((usuario) => {
-                            return (
-                                <Card
-                                    key={usuario.id}
-                                    text={usuario.name}
-                                    backgroudColor={'nome'}
-                                    textColor={'nome'}
-                                />
-                            );
-                        })
-                    )}
-                </NameContainer>
-            </div>
-        );
-    };
+2. Setar durante o erro da requisição;
 
-    export default UserNamesPage;
+3. Retorna-lo no array da função;
 
-    ```
-
--   Agora vamos trabalhar o erro:
-
-    -   Criar um estado em `useRequestData.js`:
+4. Ao final teremos o seguinte código:
 
     ```
     const [isError, setIsError] = useState(false);
 
-    (...)
+        (...)
             .then((response) => {
                 setData(response.data);
                 // setTimeout(() => seIsLoading(false), 6000);
@@ -403,57 +366,41 @@
             .catch((error) => {
                 setIsError(true);
             });
-    (...)
+        (...)
     return [data, isLoading, isError];
-    (...)
+        (...)
     ```
 
--   Agora em `UserNamesPage.js`, vms colocar uma condicional:
+#### Procedimento -> Recebendo `isError` em `UserNamesPages.js`:
 
-    ```
-    import { Title, NameContainer } from '../style';
-    import { Card } from '../components/Card/Card';
-    import useRequestData from '../hooks/useRequestData';
+```
 
-    const UserNamesPage = () => {
-        const [nomeUsuarios, isLoading, isError] = useRequestData('users');
-        return (
-            <div>
-                <Title>Nomes dos usuários</Title>
-                <NameContainer>
-                    {isError ? (
-                        <p>Erro, por favor tente novamente!</p>
-                    ) : isLoading ? (
-                        <p>CARREGANDO</p>
-                    ) : (
-                        nomeUsuarios.map((usuario) => {
-                            return (
-                                <Card
-                                    key={usuario.id}
-                                    text={usuario.name}
-                                    backgroudColor={'nome'}
-                                    textColor={'nome'}
-                                />
-                            );
-                        })
-                    )}
-                </NameContainer>
-            </div>
-        );
-    };
+        (...)
 
-    export default UserNamesPage;
+            const UserNamesPage = () => {
+            const [nomeUsuarios, isLoading, isError] = useRequestData('users');
+            return (
+        (...)
+                        {isError ? (
+                            <p>Erro, por favor tente novamente!</p>
+                        ) : isLoading ? (
+                            <p>CARREGANDO</p>
+                        ) : (
+                            nomeUsuarios.map((usuario) => {
+        (...)
+```
 
-    ```
+#### Procedimento -> Recebendo `isError` em `CommentsPage.js`:
 
--   Mostrar o carregando e a mensagem de erro na `CommentsPage.js`:
--   Recebe:
+1.  Exatamente o mesmo procedimento anterior:
+
+2.  Recebe no array já existente:
 
     ```
     const [postagens, isLoading, isError] = useRequestData('comments');
     ```
 
--   Condicional:
+3.  Utiliza em um ternário:
 
     ```
     (..)
@@ -461,10 +408,7 @@
     const CommentsPage = () => {
         const [postagens, isLoading, isError] = useRequestData('comments');
 
-        return (
-            <div>
-                <Title>Comentários dos usuários</Title>
-                <PostContainer>
+    (...)
                     {isError ? (
                         <p>Erro, por favor tente novamente!</p>
                     ) : isLoading ? (
