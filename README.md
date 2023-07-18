@@ -171,14 +171,20 @@
         }
     ```
 
--   Analisando os dois `Custom Hooks` criados, percebo que são identicos e apenas o `path` é diferente neles:
-    ![Alt text](image.png)
+---
 
--   A ideia agora é: Fazer **UM** custom hook genérico para utilizar nos dois casos!
+-   Analisando os dois `Custom Hooks` criados, percebo que são idênticos e apenas o `path` é diferente neles:
+    ![Alt text](image-1.png)
+
+-   A ideia agora é: Fazer **UM custom hook genérico** para utilizar nos DOIS casos!
 
 ---
 
--   Em `hooks` criar um arquivo chamado `useRequestData.js`, nesse arquivo eu preciso criar uma função chamada `useRequestData`, nessa função eu adapto um custom hook anteriormente criado para algo mais genérico e que receba um `path` como parâmetro, pois essa é a unica coisa que muda, ficando da seguinte forma:
+#### Procedimento -> Hook `useRequestData` :
+
+1. Em `hooks` criar um arquivo chamado `useRequestData.js`
+2. Dentro desse arquivo preciso criar uma função chamada `useRequestData`
+3. Dentro da função `useRequestData` eu adapto um custom hook anteriormente criado para algo mais genérico e que _receba_ um `path` como parâmetro, pois essa é a unica coisa que muda, ficando da seguinte forma:
 
     ```
     import { useEffect, useState } from 'react';
@@ -202,12 +208,12 @@
     };
 
     export default useRequestData;
-
     ```
 
--   Agora irei fazer a adptação em `UserNamesPage.js` utilizando o `useRequestData.js`:
+#### Procedimento -> Adaptando `UserNamesPage.js` para receber `useRequestData` :
 
--   Agora irei substituir o `useCapturanome()` para `useRequestData()`, e preciso passar o parâmetro necessário, agora o `UserNamesPage.js` fica com o seguinte código:
+1. Agora irei substituir o `useCapturanome()` para `useRequestData()`, e preciso passar o parâmetro necessário.
+2. `UserNamesPage.js` fica com o seguinte código:
 
     ```
     import { Title, NameContainer } from '../style';
@@ -238,7 +244,9 @@
     export default UserNamesPage;
     ```
 
--   Para a página de `CommentsPage.js`, eu faço a mesma adaptação:
+#### Procedimento -> Adaptando `CommentsPage.js` para receber `useRequestData` :
+
+1. Fazendo a mesma adaptação, tenho o seguinte código:
 
     ```
     import { Title, PostContainer } from '../style';
@@ -271,8 +279,7 @@
 
     ```
 
--   Agora posso excluir os arquivos: `useCapturarNome.js` e `useCapturarPostagem`, e utilizar um único custom hooks para duas requisições diferentes
--   (Mas irei deixar esses dois arquivos para poder consultar depois)
+2. Agora posso excluir os arquivos: `useCapturarNome.js` e `useCapturarPostagem`, e utilizar um único custom hooks para duas requisições diferentes. (Mas irei deixar esses dois arquivos para poder consultar depois)
 
 ## 3 Prática 3
 
