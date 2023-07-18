@@ -17,16 +17,29 @@
 ### Resolução
 
 -   A ideia é:
-    -   Colocar a lógica do arquivo `UserNamesPage.js`, presente antes do retorna da função `UserNamesPage`;
-    -   Porque o `jsx` tem como objetivo a renderização;
-    -   E tudo que vem **antes** do jsx é a lógica;
-    -   Agora o objetivo é deixar a menor quantidade de lógica possível para uma melhor organização do código e também para que ele seja reutilizado.
+    -   Tranportar para um _novo arquivo_ (custom hook) a lógica do arquivo `UserNamesPage.js`, presente antes do retorno da função `UserNamesPage`.
+    -   Isso porque o `jsx` tem como objetivo a renderização, e tudo que vem anter do `jsx` é a lógica.
+    -   O objetivo é deixar a menor quantidade de lógica possível para uma melhor organização do código e também para que ele seja reutilizável.
 
 ---
 
--   Em `src` criei uma pasta chamada `hooks` e dentro dela um arquivo chamado `useCapturarNome.js`;
+#### Procedimento -> Hook `useCapturarNome` :
 
--   Em `useCapturarNome.js` eu irei colocar toda a lógica que antes estava em `UserNamePage.js`
+1. Em `src` criei uma pasta chamada `hooks` e dentro dela um arquivo chamado `useCapturarNome.js`;
+
+2. No arquivo `useCapturarNome.js`, criei e exportei uma função chamada `useCapturarNome`:
+
+    ```
+    const useCapturarNome = () => {
+
+    };
+
+    export default useCapturarNome;
+    ```
+
+3. Transportei toda a **lógica** de `UserNamesPage.js` para dentro da função `useCapturarNome`. É importante não esquecer de importar todos os itens necessários, que nesse caso são: `axios`, `useEffect`, `useState` e a `BASE_URL`;
+
+4. É necessário também que a função `useCapturarNome` me dê um retorno, para que eu possa utiliza-lo onde desejar. Analisando o código, percebo que faz sentido retornar o `nomeUsuarios`, pois quando a requisição funciona chamamos `setNomeUsuarios(response.data)` para setar os valores de `nomeUsuarios`
 
 -   `useCapturarNome.js` possui essa lógica até o momento:
 
@@ -48,147 +61,86 @@
                     console.log(error);
                 });
         }, []);
+        return nomeUsuarios;
     };
 
     export default useCapturarNome;
-
     ```
 
--   Importante: Não esquecer de fazer as importações de tudo que for preciso para dentro desse novo arquivo!
+---
 
--   Colocar um retorno dentro da função `useCapturarNome`, nesse retorno eu peço para tudo que eu quero usar:
+5. Agora irei adaptar o `UserNamesPage.js`.
 
-    ```
-    return nomeUsuarios;
-    ```
-
--   Dentro de `UserNamesPage.js` eu importo esse retorno da seguinte forma:
+6. Dentro da função `UserNamesPage` eu importei o retorno da função `useCapturarNome` da seguinte forma:
     ```
     const retornoDaFuncao = useCapturarNome();
     ```
--   E agora eu renderizo esse `retornoDaFuncao` no lugar de `nomeUsuarios`
+7. E agora eu renderizo esse `retornoDaFuncao` no lugar de `nomeUsuarios`
 
--   no final da criação e exportação do useCapturarNome eu tenho o seguinte código:
+    ```
+    (...)
 
-    -   arquivo `useCapturarNome.js`:
+    import useCapturarNome from '../hooks/useCapturarNome';
 
-        ```
-        import axios from 'axios';
-        import { useEffect, useState } from 'react';
-        import { BASE_URL } from '../constants/constants';
+    (...)
 
-        const useCapturarNome = () => {
-            const [nomeUsuarios, setNomeUsuarios] = useState([]);
+      const UserNamesPage = () => {
 
-            useEffect(() => {
-                axios
-                    .get(`${BASE_URL}users`)
-                    .then((response) => {
-                        setNomeUsuarios(response.data);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-            }, []);
-            return nomeUsuarios;
-        };
+        const retornoDaFuncao = useCapturarNome();
 
-        export default useCapturarNome;
-        ```
+    (...)
 
-    -   arquivo `UserNamesPages.js`:
+        {retornoDaFuncao.map((usuario) => { (...)
 
-        ```
-        import { Title, NameContainer } from '../style';
-        import { Card } from '../components/Card/Card';
-        import useCapturarNome from '../hooks/useCapturarNome';
-
-        const UserNamesPage = () => {
-            const retornoDaFuncao = useCapturarNome();
-
-            return (
-                <div>
-                    <Title>Nomes dos usuários</Title>
-                    <NameContainer>
-                        {retornoDaFuncao.map((usuario) => {
-                            return (
-                                <Card
-                                    key={usuario.id}
-                                    text={usuario.name}
-                                    backgroudColor={'nome'}
-                                    textColor={'nome'}
-                                />
-                            );
-                        })}
-                    </NameContainer>
-                </div>
-            );
-        };
-
-        export default UserNamesPage;
-        ```
+    (...)
+    ```
 
     ***
 
-    -   Para `useCapturarPostagem`:
-    -   Em `hooks` criei um arquivo chamado `useCapturarPostagens.js`;
-    -   Copiei a lógica de `CommentsPages.js` e colei dentro de `useCapturarPostagnes.js`, fiz as importações e o retorno, ficando da seguinte forma:
+#### Procedimento -> Hook `useCapturarPostagem` :
 
-        ```
-        import axios from 'axios';
-        import { useEffect, useState } from 'react';
-        import { BASE_URL } from '../constants/constants';
+1.  Em `hooks` criei um arquivo chamado `useCapturarPostagens.js`;
 
-        const useCapturarPostagem = () => {
-            const [postagens, setPostagens] = useState([]);
+2.  Copiei a **lógica** de `CommentsPages.js` e colei dentro de `useCapturarPostagem.js`, fiz as importações e o retorno, ficando da seguinte forma:
 
-            useEffect(() => {
-                axios
-                    .get(`${BASE_URL}comments`)
-                    .then((response) => {
-                        setPostagens(response.data);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-            }, []);
-            return postagens;
-        };
+    ```
+    import axios from 'axios';
+    import { useEffect, useState } from 'react';
+    import { BASE_URL } from '../constants/constants';
 
-        export default useCapturarPostagem;
-        ```
+    const useCapturarPostagem = () => {
+        const [postagens, setPostagens] = useState([]);
 
-    -   Em `useCapturarPostagem.js`, eu importo e adpto para ser renderizado, ficando na seguinte forma:
+        useEffect(() => {
+            axios
+                .get(`${BASE_URL}comments`)
+                .then((response) => {
+                    setPostagens(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }, []);
+        return postagens;
+    };
 
-        ```
-        import { Title, PostContainer } from '../style';
-        import { Card } from '../components/Card/Card';
-        import useCapturarPostagem from '../hooks/useCapturarPostagem';
+    export default useCapturarPostagem;
+    ```
 
-        const CommentsPage = () => {
+3.  Em `CommentsPage.js`, eu importo e adapto o hook `useCapturarPostagem` para ser renderizado, ficando na seguinte forma:
+
+    ```
+    (...)
+    import useCapturarPostagem from '../hooks/useCapturarPostagem';
+
+    const CommentsPage = () => {
             const postagens = useCapturarPostagem();
 
-            return (
-                <div>
-                    <Title>Comentários dos usuários</Title>
-                    <PostContainer>
-                        {postagens.map((post) => {
-                            return (
-                                <Card
-                                    key={post.id}
-                                    text={post.body}
-                                    backgroudColor={'#1dc690'}
-                                    textColor={'#ffffff'}
-                                />
-                            );
-                        })}
-                    </PostContainer>
-                </div>
-            );
-        };
+    (...)
+            {postagens.map((post) => {
 
-        export default CommentsPage;
-        ```
+    (...)
+    ```
 
 ## 2 Prática 2
 
@@ -320,7 +272,7 @@
     ```
 
 -   Agora posso excluir os arquivos: `useCapturarNome.js` e `useCapturarPostagem`, e utilizar um único custom hooks para duas requisições diferentes
--   Irei deixar esses dois arquivos para poder consultar depois
+-   (Mas irei deixar esses dois arquivos para poder consultar depois)
 
 ## 3 Prática 3
 
@@ -332,3 +284,186 @@
     -   Utilize o nome `isLoading` como variável de estado.
 
 ### Resolução
+
+-   Criar um novo estado para acompanhar o estado true ou false do `isLoading`, iniciando como true e depois irá ser setado como false quando parar de carregar:
+    ```
+    const [isLoading, seIsLoading] = useState(true);
+    ```
+-   Se a requisição for concluída, logo sera em `then` eu seto para false e em cath tmbm!:
+    ```
+                .then((response) => {
+                    setData(response.data);
+                    seIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    seIsLoading(false);
+                });
+    ```
+-   por array, a ordem importa, por obje n ???
+
+-   Em `UserNamesPages.js`
+
+    ```
+    const [nomeUsuarios, isLoading] = useRequestData('users');
+
+    ```
+
+(- tRABALHAR COM COLCHETES EU FICO DE OLHO NA POSIÇÃO, N IMPORTA O NOME)
+
+(- AGORA SE EU TRABALHAR COM A {} ..SO DEUS SABE)
+
+-   `useRequestData.js` fica assim:
+
+    ```
+    /* eslint-disable react-hooks/exhaustive-deps */
+    import { useEffect, useState } from 'react';
+    import { BASE_URL } from '../constants/constants';
+    import axios from 'axios';
+
+    const useRequestData = (path) => {
+        const [data, setData] = useState([]);
+        const [isLoading, seIsLoading] = useState(true);
+
+        useEffect(() => {
+            axios
+                .get(`${BASE_URL}${path}`)
+                .then((response) => {
+                    setData(response.data);
+                    // setTimeout(() => seIsLoading(false), 6000);
+                    seIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    seIsLoading(false);
+                });
+        }, []);
+        return [data, isLoading];
+    };
+
+    export default useRequestData;
+    ```
+
+-   `UserNamePage.js` fica assim:
+
+    ```
+    import { Title, NameContainer } from '../style';
+    import { Card } from '../components/Card/Card';
+    import useRequestData from '../hooks/useRequestData';
+
+    const UserNamesPage = () => {
+        const [nomeUsuarios, isLoading] = useRequestData('users');
+        return (
+            <div>
+                <Title>Nomes dos usuários</Title>
+                <NameContainer>
+                    {isLoading ? (
+                        <p>CARREGANDO</p>
+                    ) : (
+                        nomeUsuarios.map((usuario) => {
+                            return (
+                                <Card
+                                    key={usuario.id}
+                                    text={usuario.name}
+                                    backgroudColor={'nome'}
+                                    textColor={'nome'}
+                                />
+                            );
+                        })
+                    )}
+                </NameContainer>
+            </div>
+        );
+    };
+
+    export default UserNamesPage;
+
+    ```
+
+-   Agora vamos trabalhar o erro:
+
+    -   Criar um estado em `useRequestData.js`:
+
+    ```
+    const [isError, setIsError] = useState(false);
+
+    (...)
+            .then((response) => {
+                setData(response.data);
+                // setTimeout(() => seIsLoading(false), 6000);
+                seIsLoading(false);
+            })
+            .catch((error) => {
+                setIsError(true);
+            });
+    (...)
+    return [data, isLoading, isError];
+    (...)
+    ```
+
+-   Agora em `UserNamesPage.js`, vms colocar uma condicional:
+
+    ```
+    import { Title, NameContainer } from '../style';
+    import { Card } from '../components/Card/Card';
+    import useRequestData from '../hooks/useRequestData';
+
+    const UserNamesPage = () => {
+        const [nomeUsuarios, isLoading, isError] = useRequestData('users');
+        return (
+            <div>
+                <Title>Nomes dos usuários</Title>
+                <NameContainer>
+                    {isError ? (
+                        <p>Erro, por favor tente novamente!</p>
+                    ) : isLoading ? (
+                        <p>CARREGANDO</p>
+                    ) : (
+                        nomeUsuarios.map((usuario) => {
+                            return (
+                                <Card
+                                    key={usuario.id}
+                                    text={usuario.name}
+                                    backgroudColor={'nome'}
+                                    textColor={'nome'}
+                                />
+                            );
+                        })
+                    )}
+                </NameContainer>
+            </div>
+        );
+    };
+
+    export default UserNamesPage;
+
+    ```
+
+-   Mostrar o carregando e a mensagem de erro na `CommentsPage.js`:
+-   Recebe:
+
+    ```
+    const [postagens, isLoading, isError] = useRequestData('comments');
+    ```
+
+-   Condicional:
+
+    ```
+    (..)
+
+    const CommentsPage = () => {
+        const [postagens, isLoading, isError] = useRequestData('comments');
+
+        return (
+            <div>
+                <Title>Comentários dos usuários</Title>
+                <PostContainer>
+                    {isError ? (
+                        <p>Erro, por favor tente novamente!</p>
+                    ) : isLoading ? (
+                        <p>CARREGANDO...</p>
+                    ) : (
+                        postagens.map((post) => {
+                            return (
+    (...)
+    ```
